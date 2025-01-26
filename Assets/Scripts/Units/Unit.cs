@@ -5,15 +5,17 @@ using UnityEngine.UI;
 public class Unit: MonoBehaviour
 {
     [SerializeField]
-    private string label = "Unit";
+    public string label = "Unit";
     [SerializeField]
     private Sprite image;
 
     [Space]
     [SerializeField]
-    private int dammage = 999;
+    public int dammage = 999;
     [SerializeField]
     public int health = 999;
+    [SerializeField]
+    public string type = "ally"; 
 
     [Space]
     public int weight = 1;

@@ -350,6 +350,7 @@ MonoBehaviour:
   image: {fileID: 21300000, guid: 7e4ed3782af9f8648b15cb7c1bfb9637, type: 3}
   dammage: 2
   health: 2
+  type: ennemy
   weight: 1
   level: 2
   isSelected: 0

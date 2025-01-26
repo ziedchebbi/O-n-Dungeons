@@ -11,7 +11,6 @@ public class SwapBauble : Bauble
     private void Effect()
     {
         showTooltip();
-        Debug.Log("swap baub");
         Destroy(gameObject);
     }
 }

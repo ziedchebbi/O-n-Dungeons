@@ -6,6 +6,8 @@ public class PreCombatManager : MonoBehaviour
     [SerializeField]
     private GameObject baubleContainer;
 
+    public GameObject smitebaub;
+
     [SerializeField]
     private List<GameObject> ownedBaubles = new List<GameObject>();
 
@@ -14,6 +16,13 @@ public class PreCombatManager : MonoBehaviour
 
     public void drawBaubles()
     {
+        // foreach(GameObject a in ownedBaubles)
+        // {
+        //     KillBauble(a.GetComponent<Bauble>().label);
+        // }
+
+        // ownedBaubles.Add(smitebaub);
+
         foreach (GameObject bauble in ownedBaubles)
         {
             Instantiate(bauble, baubleContainer.transform);

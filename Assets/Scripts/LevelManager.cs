@@ -5,17 +5,18 @@ using UnityEngine;
 using System.Linq;
 using UnityEngine.UI;
 using Unity.VisualScripting;
+using System;
 
 public class LevelManager : MonoBehaviour
 {
 
-    public GameObject[] currentAllyUnits;
+    public List<GameObject> currentAllyUnits = new List<GameObject>();
 
     [SerializeField]
     private GameObject[] ennemiesList;
     private List<LevelMap> ennemiesLevelMap = new List<LevelMap>(); // level:gameobject
 
-    private List<GameObject> board = new List<GameObject>();
+    public List<GameObject> board = new List<GameObject>();
     [HideInInspector]
     public List<GameObject> actualBoard = new List<GameObject>();
 
@@ -27,6 +28,7 @@ public class LevelManager : MonoBehaviour
     [SerializeField]
     private TMP_Text levelText;
 
+    public GameObject noneGameObject;
     private PreCombatManager preCombatManager;
 
     private void Start()
@@ -45,6 +47,10 @@ public class LevelManager : MonoBehaviour
 
     public void PopulateBoard()
     {
+        level++;
+        ClearBoard();
+
+        board = new List<GameObject>();
         // random Gen
         board.Add(ennemiesList[0]);
         board.Add(ennemiesList[1]);
@@ -66,17 +72,20 @@ public class LevelManager : MonoBehaviour
         AddSelectListners();
     }
 
-    private void InstantiateBoard()
+    public void InstantiateBoard()
     {
         foreach (GameObject unit in board)
         {
-            actualBoard.Add(Instantiate(unit, unitsContainer.transform));
+            if (unit != noneGameObject)
+            {
+                actualBoard.Add(Instantiate(unit, unitsContainer.transform));
+            }
         }
 
         levelText.text = "Area Level: " + level.ToString();
     }
 
-    private void ClearBoard()
+    public void ClearBoard()
     {
         board = new List<GameObject>();
         foreach (Transform child in unitsContainer.transform)
@@ -105,12 +114,83 @@ public class LevelManager : MonoBehaviour
         }
     }
 
-    public void Kill(GameObject unit)
+    public void Kill(string label)
     {
-        actualBoard.Remove(unit);
-        board.Remove(unit);
-        preCombatManager.Kill(unit);
-        unit.GetComponent<Unit>().Die();
+        foreach (GameObject unit in actualBoard)
+        {
+            if (unit.GetComponent<Unit>().label == label)
+            {
+                actualBoard.Remove(unit);
+                preCombatManager.Kill(unit);
+                unit.GetComponent<Unit>().Die();
+                break;
+            }
+        }
+
+        foreach (GameObject unit in currentAllyUnits)
+        {
+            if (unit.GetComponent<Unit>().label == label)
+            {
+                currentAllyUnits.Remove(unit);
+                return;
+            }
+        }
+
+        foreach (GameObject unit in board)
+        {
+            if (unit.GetComponent<Unit>().label == label)
+            {
+                board.Remove(unit);
+                return;
+            }
+        }
+        
+    }
+
+    public void SwapOnBoard(int idx1, int idx2)
+    {
+        GameObject tmp = actualBoard[idx1];
+        actualBoard[idx1] = actualBoard[idx2];
+        actualBoard[idx2] = tmp;
+
+        tmp = board[idx1];
+        board[idx1] = board[idx2];
+        board[idx2] = tmp;
+
+        updateSI();
+    }
+
+    public void updateSI()
+    {   
+        board = actualBoard;
+        for (int i = 0; i < actualBoard.Count; i++)
+        {
+            actualBoard[i].transform.SetSiblingIndex(i);
+        }
+    }
+
+    public bool CheckKill()
+    {
+        Debug.Log("checking kill");
+        for (int i = 0; i < actualBoard.Count; i++)
+        {
+            if (actualBoard[i].GetComponent<Unit>().health <= 0)
+            {
+                preCombatManager.Kill(actualBoard[i]);
+                actualBoard[i].GetComponent<Unit>().Die();
+                Kill(actualBoard[i].GetComponent<Unit>().label);
+                return true;
+            }
+
+        }
+
+        Sync();
+        return false;
+    }
+
+    public void Sync()
+    {
+        board = actualBoard;
     }
 }
 

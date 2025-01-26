@@ -38,7 +38,7 @@ public class SmiteBauble : Bauble
                 affected[i].GetComponent<Unit>().Dammage(dammage);
                 if (affected[i].GetComponent<Unit>().health <= 0)
                 {
-                    levelManager.Kill(affected[i]);
+                    levelManager.Kill(affected[i].GetComponent<Unit>().label);
                 }
             }
 
